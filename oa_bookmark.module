@@ -1,0 +1,85 @@
+<?php
+
+include_once('oa_bookmark.features.inc');
+
+// trick the theme system into checking our module's directory for page tpl.php files
+function oa_bookmark_theme_registry_alter(&$theme_registry) {
+  $module_path = drupal_get_path('module', 'oa_bookmark');
+  $theme_registry['page']['theme paths'][] = $module_path;
+}
+
+// add some feature-specific css
+function oa_bookmark_init() {
+  drupal_add_css(drupal_get_path('module', 'oa_bookmark') . '/oa_bookmark.css');
+}
+/*
+// clean up the "create bookmark" form
+function oa_bookmark_form_oa_bookmark_node_form_alter(&$form, &$form_state, $form_id) {
+//  dsm($form);
+  $form['author']['#type'] = 'hidden';
+  $form['options']['#type'] = 'hidden';
+  $form['revision_information']['#type'] = 'hidden';
+
+// For some reason, these aren't appearing in $form, so they are handled by the hook_form_alter below.
+//  $form['menu']['#type'] = 'hidden';
+//  $form['comment_settings']['#type'] = 'hidden';
+//  $form['body_filter']['#type'] = 'hidden';
+}
+
+// clean it up some more
+function oa_bookmark_form_alter(&$form, &$form_state) {
+//  dsm($form);
+  if ($form['form_id']['#value'] == 'oa_bookmark_node_form') {
+    $form['menu']['#type'] = 'hidden';
+    $form['comment_settings']['#type'] = 'hidden';
+  // Still not seing this one...
+  //  $form['body_filter']['#type'] = 'hidden';
+  }
+
+}
+*/
+// add a block to the user profile page with a "post to [site-name]" bookmarklet link
+function oa_bookmark_block($op = 'list', $delta = 0, $edit = array()) {
+  switch($op) {
+    case 'list':
+      $blocks[0] = array(
+        'info' => t('Bookmarklet link(s)'), 
+  //      'weight' => 0, 
+  //      'status' => 1, 
+  //      'region' => 'right',
+      );
+      return $blocks;
+
+    case 'view':
+      $block['subject'] = t('Bookmarklet Link(s)');
+      $block['content'] = t('Drag a link below to your browser\'s bookmarks bar to create a bookmarlet. Then, when you are browsing other sites, you can click this link to create a bookmark on this site.');
+
+      $block['content'] .= "<br />";
+
+      global $base_url;
+
+      if (!module_exists('og')) {
+        $site_name = variable_get('site_name');
+        $link = "javascript:u=document.location.href;t=document.title;s=window.getSelection();void(window.open(%22";
+        $link .= $base_url;
+        $link .= "/node/add/oa-bookmark?edit[title]=%22+escape(t)+'&edit[field_oa_bookmark_body][0][value]='+escape(s)+'&edit[field_oa_bookmark_url][0][url]='+escape(u),'_blank','width=600,height=500,status=no,resizable=no,scrollbars=no'))" ;
+        $block['content'] .= "<a href=" . $link . "> Post to " . $site_name . "</a>";
+      } else {
+        global $user;
+        $og_groups = $user->og_groups;
+
+        foreach ($og_groups as $group_id => $group) {
+          $group_node = node_load($group_id);
+          $group_alias = $group_node->purl; //if no OA, this works: drupal_get_path_alias("node/".$group_id);
+          $group_name = $group['title'];
+          $link = "javascript:u=document.location.href;t=document.title;s=window.getSelection();void(window.open(%22";
+          $link .= $base_url . "/" . $group_alias;
+          $link .= "/node/add/oa-bookmark?edit[title]=%22+escape(t)+'&edit[field_oa_bookmark_body][0][value]='+escape(s)+'&edit[field_oa_bookmark_url][0][url]='+escape(u),'_blank','width=600,height=500,status=no,resizable=no,scrollbars=no'))" ;
+          $block['content'] .= "<a href=" . $link . "> Post to " . $group_name . "</a><br />";
+        }
+      }
+
+      return $block;
+  } 
+}
+
