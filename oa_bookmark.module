@@ -51,13 +51,12 @@ function oa_bookmark_block($op = 'list', $delta = 0, $edit = array()) {
       return $blocks;
 
     case 'view':
+      drupal_add_js('misc/collapse.js');
       $block['subject'] = t('Bookmarklet Link(s)');
       $block['content'] = t('Drag a link below to your browser\'s bookmarks bar to create a bookmarlet. Then, when you are browsing other sites, you can click this link to create a bookmark on this site.');
-
       $block['content'] .= "<br />";
 
       global $base_url;
-
       if (!module_exists('og')) {
         $site_name = variable_get('site_name');
         $link = "javascript:u=document.location.href;t=document.title;s=window.getSelection();void(window.open(%22";
@@ -75,10 +74,12 @@ function oa_bookmark_block($op = 'list', $delta = 0, $edit = array()) {
           $link = "javascript:u=document.location.href;t=document.title;s=window.getSelection();void(window.open(%22";
           $link .= $base_url . "/" . $group_alias;
           $link .= "/node/add/oa-bookmark?edit[title]=%22+escape(t)+'&edit[field_oa_bookmark_body][0][value]='+escape(s)+'&edit[field_oa_bookmark_url][0][url]='+escape(u),'_blank','width=600,height=500,status=no,resizable=no,scrollbars=no'))" ;
-          $block['content'] .= "<a href=" . $link . "> Post to " . $group_name . "</a><br />";
+          $block['content'] .= "<a href=" . $link . "> Post to " . $group_name . "</a>";
+          $block['content'] .= "<fieldset class=\"collapsible collapsed\"><legend> -- Click for mobile instructions --</legend><span>Many mobile platforms (e.g., iPad) don't allow for bookmarking of links. As such, copy the link below, then create a bookmark with the browser's control, and paste the link into the URL field.<br />";
+          $block['content'] .= "<code>" . $link . "</code>";
+          $block['content'] .= "</span></fieldset>";
         }
       }
-
       return $block;
   } 
 }
