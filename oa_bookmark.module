@@ -75,9 +75,9 @@ function oa_bookmark_block($op = 'list', $delta = 0, $edit = array()) {
           $link .= $base_url . "/" . $group_alias;
           $link .= "/node/add/oa-bookmark?edit[title]=%22+escape(t)+'&edit[field_oa_bookmark_body][0][value]='+escape(s)+'&edit[field_oa_bookmark_url][0][url]='+escape(u),'_blank','width=600,height=500,status=no,resizable=no,scrollbars=no'))" ;
           $block['content'] .= "<a href=" . $link . "> Post to " . $group_name . "</a>";
-          $block['content'] .= "<fieldset class=\"collapsible collapsed\"><legend> -- Click for mobile instructions --</legend><span>Many mobile platforms (e.g., iPad) don't allow for bookmarking of links. As such, copy the link below, then create a bookmark with the browser's control, and paste the link into the URL field.<br />";
+          $block['content'] .= "<fieldset class=\"fieldset titled collapsible collapsed\"><legend><span class=\"fieldset-title\"> -- Mobile instructions --</span></legend><div style=\"width: 372px\" class=\"fieldset-content\">Many mobile platforms (e.g., iPad) don't allow for bookmarking of links. As such, copy the link below, then create a bookmark with the browser's control, and paste the link into the URL field.<br />";
           $block['content'] .= "<code>" . $link . "</code>";
-          $block['content'] .= "</span></fieldset>";
+          $block['content'] .= "</div></fieldset>";
         }
       }
       return $block;
